@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Confraternização de Alunos 2025</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f2f4f8;
+  margin: 0;
+  padding: 20px;
+}
+.container {
+  max-width: 760px;
+  margin: auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+header h1 {
+  font-size: 20px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+header h2 {
+  font-size: 16px;
+  color: #555;
+}
+.info-evento {
+  background: #eef2f7;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 25px;
+  font-size: 14px;
+}
+label {
+  display: block;
+  margin-top: 15px;
+  font-weight: bold;
+}
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+.responsavel {
+  display: none;
+  margin-top: 25px;
+  padding: 15px;
+  background: #fafafa;
+  border: 1px dashed #ccc;
+}
+.alerta {
+  color: #b91c1c;
+  font-size: 13px;
+}
+button {
+  margin-top: 30px;
+  width: 100%;
+  padding: 12px;
+  background: #1d4ed8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+button:hover {
+  background: #1e40af;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<header>
+  <h1>Secretaria de Esporte, Cultura, Turismo e Lazer</h1>
+  <h2>Confraternização de Alunos 2025</h2>
+</header>
+
+<div class="info-evento">
+  <p><strong>Dia:</strong> 02/02/2026</p>
+  <p><strong>Saída:</strong> 08:00 — Centro Cultural João Rodrigues Sobrinho</p>
+  <p><strong>Destino:</strong> Chácara J.A.</p>
+  <p><strong>Retorno:</strong> 18:00</p>
+</div>
+
+<form id="formulario">
+
+<label>Nome do aluno</label>
+<input type="text" id="nomeAluno" required>
+
+<label>CPF do aluno</label>
+<input type="text" id="cpfAluno" placeholder="000.000.000-00" maxlength="14" required>
+
+<label>Data de nascimento</label>
+<input type="date" id="dataNascimento" required>
+<div class="alerta" id="infoIdade"></div>
+
+<label>Endereço</label>
+<input type="text" id="endereco" required>
+
+<label>Telefone do aluno</label>
+<input type="tel" id="telefoneAluno" required>
+
+<label>Transporte</label>
+<select id="deslocamento" required>
+  <option value="">Selecione</option>
+  <option>Ônibus da organização</option>
+  <option>Carro próprio</option>
+</select>
+
+<div class="responsavel" id="responsavel">
+  <h3>Dados do Responsável</h3>
+
+  <label>Nome</label>
+  <input type="text" id="nomeResponsavel">
+
+  <label>CPF</label>
+  <input type="text" id="cpfResponsavel" placeholder="000.000.000-00" maxlength="14">
+
+  <label>Telefone</label>
+  <input type="tel" id="telefoneResponsavel">
+</div>
+
+<label>
+Declaro estar ciente do local, horários e transporte.
+Para confirmar, digite <strong>2</strong>.
+</label>
+<input type="number" id="confirmacao" required>
+
+<button type="submit">Enviar</button>
+</form>
+</div>
+
+<script>
+const url = "https://script.google.com/macros/s/AKfycbwwmIOSqpbYBdJmEi1pgoxih9FVlWR_O7w7WBzplAQzyZfWQ4A8a14Yq8ILDFdlz1Br/exec";
+
+// idade
+dataNascimento.addEventListener("change", () => {
+  const nasc = new Date(dataNascimento.value);
+  const hoje = new Date();
+  let idade = hoje.getFullYear() - nasc.getFullYear();
+  if (hoje < new Date(hoje.getFullYear(), nasc.getMonth(), nasc.getDate())) idade--;
+  infoIdade.innerText = idade < 18 ? "Menor de idade" : "Maior de idade";
+  responsavel.style.display = idade < 18 ? "block" : "none";
+});
+
+// máscara CPF
+function maskCPF(el){
+  el.addEventListener("input", ()=>{
+    el.value = el.value.replace(/\D/g,"")
+      .replace(/(\d{3})(\d)/,"$1.$2")
+      .replace(/(\d{3})(\d)/,"$1.$2")
+      .replace(/(\d{3})(\d{1,2})$/,"$1-$2");
+  });
+}
+maskCPF(cpfAluno);
+maskCPF(cpfResponsavel);
+
+// envio
+formulario.addEventListener("submit", e=>{
+  e.preventDefault();
+  if(confirmacao.value !== "2"){
+    alert("Digite 2 para confirmar.");
+    return;
+  }
+
+  fetch(url,{
+    method:"POST",
+    mode:"no-cors",
+    body: JSON.stringify({
+      nomeAluno: nomeAluno.value,
+      cpfAluno: cpfAluno.value,
+      dataNascimento: dataNascimento.value,
+      endereco: endereco.value,
+      telefoneAluno: telefoneAluno.value,
+      deslocamento: deslocamento.value,
+      nomeResponsavel: nomeResponsavel.value,
+      cpfResponsavel: cpfResponsavel.value,
+      telefoneResponsavel: telefoneResponsavel.value,
+      confirmacao: confirmacao.value
+    })
+  });
+
+  alert("Inscrição enviada com sucesso!");
+  formulario.reset();
+  responsavel.style.display="none";
+});
+</script>
+
+</body>
+</html>
